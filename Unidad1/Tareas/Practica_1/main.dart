@@ -101,4 +101,11 @@ void main() {
 
   coche.cargar(10);
   barco.cargar(10);
+
+  //Lista de transporte para demostrar polimorfismo
+  print("Lista de transportes");
+  List<Transporte> transportes = [coche, barco];
+  for (var transporte in transportes) {
+    transporte.mover();
+  }
 }
