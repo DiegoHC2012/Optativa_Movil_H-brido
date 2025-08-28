@@ -1,4 +1,4 @@
-import './function.dart';
+import 'function.dart';
 void main() {
   void saludar(String name) => print('Hello, $name!');
   saludar('John Doe');
