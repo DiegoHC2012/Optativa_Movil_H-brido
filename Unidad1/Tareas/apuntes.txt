@@ -1,0 +1,10 @@
+18/09/25
+
+Consumir el api
+datos genericos
+
+Poder imprimir formato xlm, csv y json
+cuando arranque el ususario eligira entre esos 3.
+
+consumir el api y responder en ese formato que el usuario eligio.
+implementar el formato de diseño Factory Method
