@@ -1,3 +1,4 @@
+import 'package:clase_1/widgets/custom_text_widget.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -21,6 +22,11 @@ class MainApp extends StatelessWidget {
       home: Scaffold(
         body: Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            CustomTextWidget(
+              text: "Hola desde un widget personalizado",
+              style: TextStyle(color: const Color.fromARGB(255, 101, 216, 224), fontSize: 20, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
             Padding(padding: paddingSize,
               child: Text('Hello World 1', style: textStyle,),
             ),
