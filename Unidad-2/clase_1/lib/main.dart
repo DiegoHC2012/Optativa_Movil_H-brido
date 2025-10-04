@@ -24,7 +24,7 @@ class MainApp extends StatelessWidget {
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             CustomTextWidget(
               text: "Hola desde un widget personalizado",
-              style: TextStyle(color: const Color.fromARGB(255, 101, 216, 224), fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(color: const Color.fromARGB(255, 40, 95, 99), fontSize: 20, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             Padding(padding: paddingSize,
