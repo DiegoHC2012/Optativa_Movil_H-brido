@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -18,15 +19,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String role = "customer";
   bool loading = false;
-  String? error;
+  String? errorMessage;
 
   Future<void> register() async {
     if (!formKey.currentState!.validate()) return;
 
-    setState(() => loading = true);
+    setState(() {
+      loading = true;
+      errorMessage = null;
+    });
 
     try {
-      await dio.post(
+      final response = await dio.post(
         "https://api.escuelajs.co/api/v1/users",
         data: {
           "name": nameCtrl.text.trim(),
@@ -39,21 +43,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       setState(() => loading = false);
 
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Usuario registrado exitosamente")),
       );
 
-      Navigator.pop(context);
-    } catch (e) {
-      setState(() {
-        loading = false;
-        error = "Error al registrar usuario";
-      });
+      GoRouter.of(context).go("/"); // 🔥 IR DIRECTO AL LOGIN
+
+    } on DioException catch (e) {
+      setState(() => loading = false);
+
+      if (e.response != null) {
+        // Mensaje real de la API
+        errorMessage = e.response?.data.toString();
+      } else {
+        errorMessage = "Error de conexión";
+      }
+
+      setState(() {});
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(title: const Text("Crear cuenta")),
 
@@ -63,9 +78,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           key: formKey,
           child: ListView(
             children: [
+
               TextFormField(
                 controller: nameCtrl,
-                decoration: const InputDecoration(labelText: "Nombre"),
+                decoration: const InputDecoration(
+                  labelText: "Nombre",
+                  prefixIcon: Icon(Icons.person),
+                ),
                 validator: (v) =>
                     v!.isEmpty ? "Este campo es obligatorio" : null,
               ),
@@ -73,7 +92,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               TextFormField(
                 controller: emailCtrl,
-                decoration: const InputDecoration(labelText: "Email"),
+                decoration: const InputDecoration(
+                  labelText: "Email",
+                  prefixIcon: Icon(Icons.email),
+                ),
                 validator: (v) =>
                     v!.contains("@") ? null : "Correo inválido",
               ),
@@ -82,7 +104,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextFormField(
                 controller: passCtrl,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: "Contraseña"),
+                decoration: const InputDecoration(
+                  labelText: "Contraseña",
+                  prefixIcon: Icon(Icons.lock_outline),
+                ),
                 validator: (v) =>
                     v!.length < 6 ? "Mínimo 6 caracteres" : null,
               ),
@@ -92,31 +117,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 value: role,
                 items: const [
                   DropdownMenuItem(
-                      value: "customer", child: Text("Cliente")),
-                  DropdownMenuItem(value: "admin", child: Text("Admin")),
+                    value: "customer",
+                    child: Text("Cliente"),
+                  ),
+                  DropdownMenuItem(
+                    value: "admin",
+                    child: Text("Administrador"),
+                  ),
                 ],
                 onChanged: (v) => setState(() => role = v!),
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.admin_panel_settings),
+                  labelText: "Tipo de usuario",
+                ),
               ),
               const SizedBox(height: 16),
 
               TextFormField(
                 controller: avatarCtrl,
-                decoration: const InputDecoration(labelText: "Avatar URL"),
+                decoration: const InputDecoration(
+                  labelText: "Avatar URL",
+                  prefixIcon: Icon(Icons.image_outlined),
+                ),
               ),
-              const SizedBox(height: 24),
+
+              const SizedBox(height: 30),
 
               loading
                   ? const Center(child: CircularProgressIndicator())
                   : FilledButton(
                       onPressed: register,
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
                       child: const Text("Registrar usuario"),
                     ),
 
-              if (error != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: Text(error!, style: const TextStyle(color: Colors.red)),
+              const SizedBox(height: 16),
+
+              // ⭐ BOTÓN "IR AL LOGIN"
+              TextButton(
+                onPressed: () => GoRouter.of(context).go("/"),
+                child: const Text("¿Ya tienes cuenta? Iniciar sesión"),
+              ),
+
+              if (errorMessage != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  errorMessage!,
+                  style: TextStyle(color: color.error),
                 ),
+              ],
             ],
           ),
         ),
