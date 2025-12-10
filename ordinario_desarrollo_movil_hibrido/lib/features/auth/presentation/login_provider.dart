@@ -12,9 +12,7 @@ class LoginProvider extends ChangeNotifier {
   bool loading = false;
   String? errorMessage;
 
-  LoginProvider() {
-    restoreSession();
-  }
+  LoginProvider();
 
   Future<void> restoreSession() async {
     final userJson = await SessionStorage.loadUser();

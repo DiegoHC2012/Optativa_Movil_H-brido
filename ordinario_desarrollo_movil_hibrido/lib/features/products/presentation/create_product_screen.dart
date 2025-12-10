@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class CreateProductScreen extends StatefulWidget {
   @override
@@ -15,7 +16,13 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Crear producto")),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => GoRouter.of(context).pop(),
+        ),
+        title: const Text("Crear producto"),
+      ),
 
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -59,7 +66,8 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
 
               TextFormField(
                 controller: priceCtrl,
-                decoration: const InputDecoration(labelText: "Precio"),
+                decoration:
+                    const InputDecoration(labelText: "Precio del producto"),
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   final p = double.tryParse(v ?? "");
@@ -71,17 +79,16 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
               const SizedBox(height: 30),
 
               FilledButton.icon(
+                icon: const Icon(Icons.save),
+                label: const Text("Guardar producto"),
                 onPressed: () {
                   if (formKey.currentState!.validate()) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text("Producto guardado localmente")),
+                      const SnackBar(content: Text("Producto guardado")),
                     );
                   }
                 },
-                icon: const Icon(Icons.save),
-                label: const Text("Guardar"),
-              )
+              ),
             ],
           ),
         ),

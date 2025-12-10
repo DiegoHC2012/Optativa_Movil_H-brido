@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'config/router/app_router.dart';
 import 'config/theme/app_theme.dart';
 
@@ -8,18 +7,26 @@ import 'features/auth/presentation/login_provider.dart';
 import 'features/products/presentation/product_provider.dart';
 import 'features/favorites/favorites_provider.dart';
 
-void main() {
-  runApp(const MixterioApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Crear el provider MANUALMENTE para restaurar sesión antes del runApp
+  final loginProvider = LoginProvider();
+  await loginProvider.restoreSession();
+
+  runApp(MixterioApp(loginProvider: loginProvider));
 }
 
 class MixterioApp extends StatelessWidget {
-  const MixterioApp({super.key});
+  final LoginProvider loginProvider;
+
+  const MixterioApp({super.key, required this.loginProvider});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => LoginProvider()),
+        ChangeNotifierProvider<LoginProvider>.value(value: loginProvider),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
       ],

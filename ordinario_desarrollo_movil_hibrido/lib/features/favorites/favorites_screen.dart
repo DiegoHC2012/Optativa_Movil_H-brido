@@ -11,21 +11,22 @@ class FavoritesScreen extends StatelessWidget {
     final fav = context.watch<FavoritesProvider>();
     final products = context.watch<ProductProvider>();
 
-    final favorites = products.products
+    final favorites = products.filtered
         .where((p) => fav.favoriteIds.contains(p.id))
         .toList();
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => GoRouter.of(context).pop(),
+        ),
         title: const Text("Favoritos"),
       ),
 
       body: favorites.isEmpty
           ? const Center(
-              child: Text(
-                "No tienes productos favoritos aún 💙",
-                style: TextStyle(fontSize: 16),
-              ),
+              child: Text("No tienes productos favoritos 💙"),
             )
           : ListView.builder(
               padding: const EdgeInsets.all(12),
@@ -34,17 +35,14 @@ class FavoritesScreen extends StatelessWidget {
                 final p = favorites[i];
 
                 return Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
                   child: ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(p.image, height: 55),
-                    ),
+                    leading: Image.network(p.image, width: 50),
                     title: Text(p.title),
                     subtitle: Text("\$${p.price}"),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () => context.go("/product/${p.id}"),
+
+                    // FIX DEFINITIVO: usar push, nunca go
+                    onTap: () => context.push("/product/${p.id}"),
                   ),
                 );
               },

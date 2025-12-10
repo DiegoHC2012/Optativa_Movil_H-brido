@@ -33,18 +33,16 @@ final appRouter = GoRouter(
   initialLocation: "/splash",
 
   routes: [
-    /// ================================
-    /// SPLASH SCREEN
-    /// ================================
+
+    // ============================================================
+    // PANTALLAS PÚBLICAS
+    // ============================================================
     GoRoute(
       path: "/splash",
       pageBuilder: (_, __) =>
           FadeTransitionPage(child: SplashScreen()),
     ),
 
-    /// ================================
-    /// AUTH
-    /// ================================
     GoRoute(
       path: "/",
       pageBuilder: (_, __) =>
@@ -57,48 +55,62 @@ final appRouter = GoRouter(
           FadeTransitionPage(child: RegisterScreen()),
     ),
 
-    /// ================================
-    /// HOME (requiere login)
-    /// ================================
-    GoRoute(
-      path: "/home",
-      redirect: AuthGuard.requireLogin,
-      pageBuilder: (_, __) =>
-          FadeTransitionPage(child: HomeScreen()),
+    // ============================================================
+    // SHELL ROUTE - TODAS LAS PANTALLAS QUE NECESITAN BACK
+    // COMPARTEN EL MISMO NAVIGATOR → NO MÁS “There is nothing to pop”
+    // ============================================================
+    ShellRoute(
+      builder: (_, __, child) => child,
+      routes: [
+
+        // HOME (requiere login)
+        GoRoute(
+          path: "/home",
+          redirect: AuthGuard.requireLogin,
+          pageBuilder: (_, __) =>
+              FadeTransitionPage(child: HomeScreen()),
+        ),
+
+        // PRODUCTOS
+        GoRoute(
+          path: "/products",
+          redirect: AuthGuard.requireLogin,
+          pageBuilder: (_, __) =>
+              FadeTransitionPage(child: ProductsScreen()),
+        ),
+
+        // DETALLE
+        GoRoute(
+          path: "/product/:id",
+          redirect: AuthGuard.requireLogin,
+          pageBuilder: (context, state) {
+            final id = int.parse(state.pathParameters["id"]!);
+            return FadeTransitionPage(
+              child: ProductDetailScreen(productId: id),
+            );
+          },
+        ),
+
+        // FAVORITOS
+        GoRoute(
+          path: "/favorites",
+          redirect: AuthGuard.requireLogin,
+          pageBuilder: (_, __) =>
+              FadeTransitionPage(child: FavoritesScreen()),
+        ),
+      ],
     ),
 
-    /// ================================
-    /// ADMIN DASHBOARD (solo admin)
-    /// ================================
+    // ============================================================
+    // RUTAS ADMIN
+    // ============================================================
     GoRoute(
       path: "/admin-dashboard",
       redirect: AuthGuard.requireAdmin,
-      builder: (_, __) => AdminDashboard(),
-    ),
-
-    /// ================================
-    /// PRODUCTOS
-    /// ================================
-    GoRoute(
-      path: "/products",
-      redirect: AuthGuard.requireLogin,
       pageBuilder: (_, __) =>
-          FadeTransitionPage(child: ProductsScreen()),
+          FadeTransitionPage(child: AdminDashboard()),
     ),
 
-    GoRoute(
-      path: "/product/:id",
-      redirect: AuthGuard.requireLogin,
-      pageBuilder: (context, state) {
-        final id = int.parse(state.pathParameters["id"]!);
-        return FadeTransitionPage(
-            child: ProductDetailScreen(productId: id));
-      },
-    ),
-
-    /// ================================
-    /// CREAR PRODUCTO (ADMIN)
-    /// ================================
     GoRoute(
       path: "/create-product",
       redirect: AuthGuard.requireAdmin,
@@ -106,22 +118,13 @@ final appRouter = GoRouter(
           FadeTransitionPage(child: CreateProductScreen()),
     ),
 
-    /// ================================
-    /// FAVORITOS
-    /// ================================
-    GoRoute(
-      path: "/favorites",
-      redirect: AuthGuard.requireLogin,
-      pageBuilder: (_, __) =>
-          FadeTransitionPage(child: FavoritesScreen()),
-    ),
-
-    /// ================================
-    /// ACCESS DENIED
-    /// ================================
+    // ============================================================
+    // ACCESS DENIED
+    // ============================================================
     GoRoute(
       path: "/access-denied",
-      builder: (_, __) => AccessDeniedScreen(),
+      pageBuilder: (_, __) =>
+          FadeTransitionPage(child: AccessDeniedScreen()),
     ),
   ],
 );

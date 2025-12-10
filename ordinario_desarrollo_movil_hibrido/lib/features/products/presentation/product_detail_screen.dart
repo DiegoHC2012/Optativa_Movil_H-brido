@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../favorites/favorites_provider.dart';
-import '../presentation/product_provider.dart';
+import 'product_provider.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final int productId;
@@ -13,11 +15,15 @@ class ProductDetailScreen extends StatelessWidget {
     final provider = context.watch<ProductProvider>();
     final fav = context.watch<FavoritesProvider>();
 
-    final p = provider.products.firstWhere((e) => e.id == productId);
+    final p = provider.filtered.firstWhere((e) => e.id == productId);
     final isFav = fav.favoriteIds.contains(productId);
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => GoRouter.of(context).pop(),
+        ),
         title: Text(p.title),
         actions: [
           IconButton(
@@ -32,13 +38,11 @@ class ProductDetailScreen extends StatelessWidget {
 
       body: ListView(
         children: [
-          Hero(
-            tag: "product-image-$productId",
-            child: Image.network(
-              p.image,
-              height: 300,
-              fit: BoxFit.cover,
-            ),
+          Image.network(
+            p.image,
+            height: 300,
+            width: double.infinity,
+            fit: BoxFit.cover,
           ),
 
           Padding(
@@ -46,38 +50,33 @@ class ProductDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(p.title,
-                    style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                  p.title,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
                 const SizedBox(height: 8),
 
                 Text(
                   "\$${p.price}",
                   style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 24, fontWeight: FontWeight.bold),
                 ),
 
                 const SizedBox(height: 12),
                 Chip(label: Text(p.category)),
 
                 const SizedBox(height: 20),
+
                 const Text(
                   "Descripción",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 const SizedBox(height: 8),
+
                 const Text(
                   "Producto de excelente calidad, importado y con garantía incluida. "
-                  "Perfecto para agregar a tu colección.",
+                  "Perfecto para tu colección o uso personal.",
                 ),
-
-                const SizedBox(height: 30),
-                FilledButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.shopping_cart_outlined),
-                  label: const Text("Agregar al carrito"),
-                )
               ],
             ),
           )

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import './customer_welcome_screen.dart';
 
 import '../auth/presentation/login_provider.dart';
 import './admin_dashboard.dart';
@@ -15,10 +16,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<LoginProvider>().user!;
+    final login = context.watch<LoginProvider>();
+
+    // 🔥 FIX: mientras no haya usuario, mostrar loading
+    if (login.user == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final user = login.user!;
 
     final pagesCustomer = [
-      _CustomerHomeMenu(),
+      CustomerWelcomeScreen(),
       _CustomerFavorites(),
     ];
 
@@ -81,8 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.favorite_outline),
-                  label: "Favoritos",
-                ),
+                  label: "Favoritos"),
               ],
             )
           : null,
@@ -97,7 +106,7 @@ class _CustomerHomeMenu extends StatelessWidget {
       child: FilledButton.icon(
         icon: const Icon(Icons.store_mall_directory_outlined),
         label: const Text("Explorar productos"),
-        onPressed: () => context.go("/products"),
+        onPressed: () => context.push("/products"),
       ),
     );
   }
@@ -110,7 +119,7 @@ class _CustomerFavorites extends StatelessWidget {
       child: FilledButton.icon(
         icon: const Icon(Icons.favorite_border),
         label: const Text("Ver favoritos"),
-        onPressed: () => context.go("/favorites"),
+        onPressed: () => context.push("/favorites"),
       ),
     );
   }
@@ -123,7 +132,7 @@ class _AdminCreateProduct extends StatelessWidget {
       child: FilledButton.icon(
         icon: const Icon(Icons.add_box_outlined),
         label: const Text("Crear producto"),
-        onPressed: () => context.go("/create-product"),
+        onPressed: () => context.push("/create-product"),
       ),
     );
   }
